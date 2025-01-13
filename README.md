@@ -1,1 +1,23 @@
-# quete-script-processus
+#!/bin/bash
+
+# En-tête pour l'affichage
+echo -e "Name\t\tPID"
+
+# Fonction pour obtenir le nom et le PID d'un processus
+get_process_info() {
+    local pid=$1
+    local name=$(ps -p "$pid" -o comm=) # Récupère le nom du processus
+    echo -e "${name}\t\t${pid}"
+}
+
+# PID initial : celui du script
+current_pid=$$
+
+# Boucle pour afficher les ancêtres
+while [ "$current_pid" -ne 1 ]; do
+    get_process_info "$current_pid"
+    current_pid=$(ps -p "$current_pid" -o ppid=) # Passe au PID parent
+done
+
+# Ajoute le processus de PID 1 (init/systemd)
+get_process_info 1
